@@ -9,3 +9,5 @@ sessions.db
 .env
 server.pid
 logs/
+netlify upload/
+render upload/

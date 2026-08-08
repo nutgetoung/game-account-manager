@@ -14,6 +14,7 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required for the
 const db = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 const port = process.env.PORT || 3000;
 const isProduction = process.env.NODE_ENV === "production";
+const frontendUrl = process.env.FRONTEND_URL || process.env.APP_URL || `http://localhost:${port}`;
 const encryptionKey = process.env.ENCRYPTION_KEY
   ? crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY).digest()
   : crypto.createHash("sha256").update("development-only-key").digest();
@@ -41,6 +42,17 @@ app.disable("x-powered-by");
 if (isProduction) app.set("trust proxy", 1);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "50kb" }));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin === frontendUrl || (!isProduction && origin === "http://localhost:3000")) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Vary", "Origin");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 app.get("/health", (_req, res) => res.json({ ok: true }));
 const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,

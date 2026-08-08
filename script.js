@@ -1,6 +1,7 @@
 const STORAGE_KEY = "gameAccounts";
-const API_BASE_URL = window.API_BASE_URL || "";
+const API_BASE_URL = window.API_BASE_URL || (window.location.hostname === "localhost" ? "" : "https://game-account-manager-y11w.onrender.com");
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
+const requestOptions = (options = {}) => ({ credentials: "include", ...options });
 const accountForm = document.getElementById("account-form");
 const gameNameInput = document.getElementById("game-name");
 const gameSuggestions = document.getElementById("game-suggestions");
@@ -71,7 +72,7 @@ function loadAccounts() {
 function saveAccounts(accounts) {
   accountsCache = accounts;
   if (currentUser) {
-    fetch(apiUrl("/api/accounts"), {
+    fetch(apiUrl("/api/accounts"), requestOptions({
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(accounts),
@@ -79,7 +80,7 @@ function saveAccounts(accounts) {
       if (!response.ok) throw new Error("Save failed");
     }).catch(() => {
       authMessage.textContent = "Unable to save changes to the database.";
-    });
+    }));
   }
 }
 
@@ -90,11 +91,11 @@ async function authenticate(mode) {
     authConfirmPasswordInput.focus();
     return;
   }
-  const response = await fetch(apiUrl(`/api/auth/${mode}`), {
+  const response = await fetch(apiUrl(`/api/auth/${mode}`), requestOptions({
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: authUsernameInput.value.trim(), email: authEmailInput.value.trim(), password: authPasswordInput.value }),
-  });
+  }));
   const data = await response.json();
   if (!response.ok) {
     authMessage.textContent = data.error || "Authentication failed.";
@@ -107,7 +108,7 @@ async function authenticate(mode) {
     return;
   }
   currentUser = data;
-  const accountsResponse = await fetch(apiUrl("/api/accounts"));
+  const accountsResponse = await fetch(apiUrl("/api/accounts"), requestOptions());
   accountsCache = await accountsResponse.json();
   currentUsername.textContent = currentUser.username;
   loggedOutView.hidden = true;
@@ -119,10 +120,10 @@ async function authenticate(mode) {
 }
 
 async function checkAuthentication() {
-  const response = await fetch(apiUrl("/api/auth/me"));
+  const response = await fetch(apiUrl("/api/auth/me"), requestOptions());
   currentUser = await response.json();
   if (currentUser) {
-    const accountsResponse = await fetch(apiUrl("/api/accounts"));
+    const accountsResponse = await fetch(apiUrl("/api/accounts"), requestOptions());
     accountsCache = await accountsResponse.json();
     currentUsername.textContent = currentUser.username;
     loggedOutView.hidden = true;
@@ -133,7 +134,7 @@ async function checkAuthentication() {
 }
 
 async function logout() {
-  await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
+  await fetch(apiUrl("/api/auth/logout"), requestOptions({ method: "POST" }));
   currentUser = null;
   accountsCache = [];
   loggedOutView.hidden = false;
@@ -191,11 +192,11 @@ async function requestPasswordReset() {
     { name: "email", label: "Gmail address", type: "email" },
   ]);
   if (!values) return;
-  const response = await fetch(apiUrl("/api/auth/forgot-password"), {
+  const response = await fetch(apiUrl("/api/auth/forgot-password"), requestOptions({
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: values.username.trim(), email: values.email.trim() }),
-  });
+  }));
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Password reset request failed.");
   authMessage.textContent = data.message || data.error;
@@ -213,11 +214,11 @@ async function handlePasswordResetLink() {
     authMessage.textContent = "New passwords do not match.";
     return;
   }
-  const response = await fetch(apiUrl("/api/auth/reset-password"), {
+  const response = await fetch(apiUrl("/api/auth/reset-password"), requestOptions({
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, ...values }),
-  });
+  }));
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Password reset failed.");
   setAuthMode("login");

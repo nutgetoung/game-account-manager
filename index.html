@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Account Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <section class="auth-section" id="auth-section">
+      <div id="logged-out-view">
+        <div class="auth-heading">
+          <span class="auth-kicker">✦ Your cozy vault</span>
+          <h1>Welcome back</h1>
+          <p>Keep every game account safe, tidy, and close at hand.</p>
+        </div>
+        <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+          <button type="button" id="login-tab" class="auth-tab active" role="tab" aria-selected="true">Sign in</button>
+          <button type="button" id="register-tab" class="auth-tab" role="tab" aria-selected="false">Create account</button>
+        </div>
+        <form id="auth-form" class="auth-form">
+          <label for="auth-username">Username</label>
+          <input id="auth-username" type="text" placeholder="Choose a username" minlength="3" required autocomplete="username" />
+          <div id="auth-email-field" hidden>
+            <label for="auth-email">Gmail address</label>
+            <input id="auth-email" type="email" placeholder="you@gmail.com" autocomplete="email" />
+          </div>
+          <label for="auth-password">Password</label>
+          <div class="password-input-wrap">
+            <input id="auth-password" type="password" placeholder="Your password" minlength="8" required autocomplete="current-password" />
+            <button type="button" id="auth-password-toggle" aria-label="Show password">Show</button>
+          </div>
+          <div id="confirm-password-field" hidden>
+            <label for="auth-confirm-password">Confirm password</label>
+            <input id="auth-confirm-password" type="password" placeholder="Repeat your password" minlength="8" autocomplete="new-password" />
+          </div>
+          <div id="password-strength" class="password-strength" aria-live="polite"></div>
+          <button type="submit" id="login-button" class="auth-submit">Sign in to vault</button>
+          <button type="button" id="forgot-password" class="text-button">Forgot password?</button>
+        </form>
+        <p id="auth-message" role="status"></p>
+      </div>
+    </section>
+    <main id="app-content" hidden>
+    <div class="menu-bar">
+      <div class="menu-brand">Game Account Manager</div>
+      <div class="menu-items">
+        <button type="button" id="export-data" class="menu-item">Export</button>
+        <button type="button" id="import-data" class="menu-item">Import</button>
+      </div>
+      <div id="logged-in-view" class="logged-in-menu" hidden>
+        <span>Signed in as <strong id="current-username"></strong></span>
+        <button type="button" id="logout-button" class="menu-item">Log Out</button>
+      </div>
+      <input id="import-file" type="file" accept="application/json" hidden />
+    </div>
+
+    <section class="form-section">
+      <h2>Add New Account</h2>
+      <form id="account-form">
+        <label>
+          Game Name
+          <div class="dropdown-wrapper">
+            <input type="text" id="game-name" placeholder="Enter or choose game name" required autocomplete="off" />
+            <div class="suggestions" id="game-suggestions"></div>
+          </div>
+        </label>
+        <label>
+          User ID
+          <input type="text" id="user-id" placeholder="Enter user id" required />
+        </label>
+        <label>
+          Email (optional)
+          <input type="email" id="email" placeholder="Enter email address" />
+        </label>
+        <label>
+          Password
+          <input type="password" id="password" placeholder="Enter password" required />
+        </label>
+        <label>
+          Notes (optional)
+          <input type="text" id="notes" placeholder="Add account notes" />
+        </label>
+        <div class="actions">
+          <button type="submit">Save Account</button>
+          <button type="button" id="clear-storage">Clear All</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="table-section">
+      <h2>Saved Accounts</h2>
+      <div class="search-bar">
+        <div class="search-pill">Search</div>
+        <input id="search-query" type="search" placeholder="Search accounts..." autocomplete="off" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>User ID</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="account-list">
+            <tr>
+              <td colspan="6" class="empty-state">No accounts saved yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <p>Note: This site stores data only in your browser. Do not use it for sensitive credentials on shared devices.</p>
+    </footer>
+    </main>
+  </div>
+
+  <div id="delete-modal" class="modal-backdrop" hidden>
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+      <div class="confirm-icon">!</div>
+      <h2 id="delete-modal-title">Delete this account?</h2>
+      <p id="delete-modal-message">This account will be removed from your vault.</p>
+      <div class="confirm-actions">
+        <button type="button" id="cancel-delete" class="cancel-button">Keep account</button>
+        <button type="button" id="confirm-delete" class="confirm-delete-button">Delete account</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="input-modal" class="modal-backdrop" hidden>
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="input-modal-title">
+      <div class="confirm-icon">?</div>
+      <h2 id="input-modal-title">Enter information</h2>
+      <p id="input-modal-message"></p>
+      <form id="input-modal-form">
+        <div id="input-modal-fields"></div>
+        <div class="confirm-actions">
+          <button type="button" id="cancel-input-modal" class="cancel-button">Cancel</button>
+          <button type="submit" class="confirm-delete-button">Continue</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+game-accounts.db
+game-accounts.db-shm
+game-accounts.db-wal
+game-accounts.backup.db
+sessions.db
+.sessions.db
+.vault-key
+.env
+server.pid
+logs/

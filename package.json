@@ -1,0 +1,25 @@
+{
+  "name": "game-account-manager",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "start:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-localhost.ps1",
+    "stop:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-localhost.ps1"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^11.10.0",
+    "connect-pg-simple": "^10.0.0",
+    "connect-sqlite3": "^0.9.18",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.6.2",
+    "express-session": "^1.18.1",
+    "helmet": "^8.3.0",
+    "nodemailer": "^9.0.5",
+    "pg": "^8.22.0"
+  }
+}

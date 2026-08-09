@@ -1,5 +1,5 @@
 const STORAGE_KEY = "gameAccounts";
-const API_BASE_URL = window.API_BASE_URL || "";
+const API_BASE_URL = window.API_BASE_URL || (window.location.hostname === "localhost" ? "" : "https://game-account-manager-y11w.onrender.com");
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 const requestOptions = (options = {}) => ({ credentials: "include", ...options });
 const accountForm = document.getElementById("account-form");

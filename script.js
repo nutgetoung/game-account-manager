@@ -80,7 +80,7 @@ function saveAccounts(accounts) {
       if (!response.ok) throw new Error("Save failed");
     }).catch(() => {
       authMessage.textContent = "Unable to save changes to the database.";
-    }));
+    });
   }
 }
 

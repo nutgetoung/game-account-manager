@@ -76,7 +76,7 @@ function saveAccounts(accounts) {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(accounts),
-    }).then((response) => {
+    })).then((response) => {
       if (!response.ok) throw new Error("Save failed");
     }).catch(() => {
       authMessage.textContent = "Unable to save changes to the database.";

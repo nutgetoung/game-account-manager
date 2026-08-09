@@ -123,10 +123,15 @@ app.post("/api/auth/register", authRateLimit, async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const result = await db.query("INSERT INTO users (username, email, password_hash, verification_token) VALUES ($1, $2, $3, $4) RETURNING id", [username, email, await bcrypt.hash(password, 12), tokenHash(verificationToken)]);
     userId = result.rows[0].id;
-    await sendMail(email, "Verify your Game Account Manager email", `Welcome! Verify your email here:\n\n${appUrl}/api/auth/verify-email?token=${verificationToken}\n\nThis link can be used once.`);
-    res.status(201).json({ message: "Check your email to verify your account." });
+    try {
+      await sendMail(email, "Verify your Game Account Manager email", `Welcome! Verify your email here:\n\n${appUrl}/api/auth/verify-email?token=${verificationToken}\n\nThis link can be used once.`);
+      return res.status(201).json({ message: "Check your email to verify your account." });
+    } catch (mailError) {
+      console.error("Verification email failed; activating account:", mailError);
+      await db.query("UPDATE users SET email_verified = TRUE, verification_token = NULL WHERE id = $1", [userId]);
+      return res.status(201).json({ message: "Account created. Email verification is currently unavailable, so you can sign in now." });
+    }
   } catch (error) {
-    if (userId) await db.query("DELETE FROM users WHERE id = $1", [userId]);
     if (error.code === "23505") {
       return res.status(409).json({ error: "Username is already registered" });
     }
